@@ -1,111 +1,112 @@
 
 ## Required Library List
-
 library(dplyr)
-library(tidyr)
-library(lubridate)
-library(data.table)
-library(reshape)
-library(reshape2)
 
 
-## Loading Data Tables
+## Loading Universal Data Tables: features and activity_labels
 
 ## Features List Table - features.txt - 561 obs of 2 variables
 featuresdata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\features.txt", col.names = c("featureid", "featurename"))
-### no longer required ### featuresdata <-featuresdata %>% rename(featureid = V1, featurename = V2)  ## Rename Columns
 
-      ## Creating Column names out of features list
-      featuresdatacolname <- featuresdata$featurename   ## Creates a character vector - for use with colnames() to create column names
+## Creating Column names out of features list
+featuresdatacolname <- featuresdata$featurename   ## Creates a character vector - for use with colnames() to create column names
 
 
 ## Activity Labels - activity_labels.txt - 6 obs of 2 variables
 activitylabels <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\activity_labels.txt", col.names = c("activityid", "activity"))
-### no longer required ## activitylabels <- activitylabels %>% rename(activityid = V1, activity = V2)   ## Rename Columns
 
+
+## Loading Test data: subject_test, X_test, y_test 
+#--------------------------------------------------------------
 
 ## Test Subjects - subject_test.txt - 2947 obs of 1 variable
 subjecttestdata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\test\\subject_test.txt", col.names = c("subject"))
-### no longer required ### subjecttestdata <- subjecttestdata %>% rename(subject = V1)   ## Rename Columns
-
 
 ## Activity ID for Rows - y_test.txt - 2947 obs of 1 variable
 ytestdata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\test\\y_test.txt", col.names = c("activityid"))
-### no longer required ### ytestdata <- ytestdata %>% rename(activityid = V1)   ## Rename Columns
-
 
 ## Test Data - X_test.txt - 2947 obs of 561 variables
-xtestdata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\test\\X_test.txt", col.names = featuresdata$featurename)
+xtestdata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\test\\X_test.txt") ## renaming the column names???  , col.names = featuresdata$featurename)
+colnames(xtestdata) <- featuresdatacolname   ## Assigns the character vector as the column names
 
 
-
-###################################################
-
-
-
+## Joining Test data
+#--------------------------------------------------------------
 
 ##  Joining Activity Labels to Activity list
 activitydatatest <- ytestdata %>% left_join(activitylabels, by = "activityid")   ## Join the activity list with activity labels
 ## TESTING activitydatatest <- mutate(activity, V3 = rownames(activity))   ## TESTING - Adds rownames() as a column to test if the data moves when using "merge" 
-
 
 ## Joining the subjecttest list with activity
 activityanalysistest <- cbind(subjecttestdata, activity = activitydatatest$activity, xtestdata)   ## Combines the rows without changing the order
 
 
 
-## Assigning Column names out of features list
-### NO LONGER REQUIRED ### colnames(xtestdata) <- featuresdatacolname   ## Assigns the character vector as the column names
-
-
-#---------------------------------------------------------------------------
-#---------------------------------------------------------------------------
-#Train Data (below)
-#---------------------------------------------------------------------------
-#---------------------------------------------------------------------------
-
+## Loading Train data: subject_train, X_train, y_train 
+#--------------------------------------------------------------
 
 ## Train Subjects - subject_train.txt - 2947 obs of 1 variable
 subjecttraindata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\train\\subject_train.txt", col.names = c("subject"))
-### no longer needed ### subjecttraindata <- subjecttraindata %>% rename(subject = V1)   ## Rename Columns
 
 ## Train Data - X_train.txt - 2947 obs of 561 variables
-xtraindata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\train\\X_train.txt", col.names = featuresdata$featurename)
+xtraindata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\train\\X_train.txt")  ## renaming the column names???  , col.names = featuresdata$featurename)
+colnames(xtraindata) <- featuresdatacolname   ## Assigns the character vector as the column names
 
 ## Activity ID for Rows - y_train.txt - 2947 obs of 1 variable
 ytraindata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\train\\y_train.txt", col.names = c("activityid"))
-### no longer needed ### ytraindata <- ytraindata %>% rename(activityid = V1)   ## Rename Columns
 
 
-###################################################
-
+## Joining Train data
+#--------------------------------------------------------------
 
 ##  Joining Activity Labels to Activity list
 activitydatatrain <- ytraindata %>% left_join(activitylabels, by = "activityid")   ## Join the activity list with activity labels
-## TESTING activitydatatrain <- mutate(activity, V3 = rownames(activity))   ## TESTING - Adds rownames() as a column to test if the data moves when using "merge" 
-
 
 ## Joining the subjecttrain list with activity
 activityanalysistrain <- cbind(subjecttraindata, activity = activitydatatrain$activity, xtraindata)   ## Combines the rows without changing the order
 
 
 
-## Assigning Column names out of features list
-### NO LONGER REQUIRED ###colnames(xtraindata) <- featuresdatacolname   ## Assigns the character vector as the column names
-
-
-
-
+## Combining Train and Test data
+#--------------------------------------------------------------
 
 ## Full Combine of data (future) - Testing with activity analysis
 activityanalysistidy <- rbind(activityanalysistest, activityanalysistrain)
 
 
 
+## Filtering to mean() and std()
+#--------------------------------------------------------------
 
-### WORKING ###
 ## Filtering Samples - mean() and std()
+activityanalysistidy <- activityanalysistidy %>% select(subject, activity, contains("mean", ignore.case = TRUE), contains("std", ignore.case = TRUE))
 
+
+
+## Renaming data columns
+#--------------------------------------------------------------
+
+## Appropriate Names
+names(activityanalysistidy)<-gsub("^t", "Time.", names(activityanalysistidy))
+names(activityanalysistidy)<-gsub("^f", "Frequency.", names(activityanalysistidy))
+names(activityanalysistidy)<-gsub("[Aa]cc", "Accelerometer", names(activityanalysistidy))
+names(activityanalysistidy)<-gsub("[Gg]yro", "Gyroscopic", names(activityanalysistidy))
+names(activityanalysistidy)<-gsub("[Mm]ag", "Magnitude", names(activityanalysistidy))
+names(activityanalysistidy)<-gsub("[Bb]ody[Bb]ody", "Body", names(activityanalysistidy))
+names(activityanalysistidy)<-gsub("-[Mm]ean\\()", ".Mean", names(activityanalysistidy))
+names(activityanalysistidy)<-gsub("-[Mm]eanFreq\\()", ".MeanFrequency", names(activityanalysistidy))
+names(activityanalysistidy)<-gsub("-[Ss]td\\()", ".STD", names(activityanalysistidy))
+names(activityanalysistidy)<-gsub("[Aa]ngle", "Angle", names(activityanalysistidy))
+names(activityanalysistidy)<-gsub("\\(tBody", "\\(Time.Body", names(activityanalysistidy))
+
+
+
+## Creating an independent data set - Average of each variable
+#--------------------------------------------------------------
+
+independenttidy <- activityanalysistidy %>%
+      group_by(subject,activity) %>%
+      summarize(across(everything(), list(mean)))
 
 
 
@@ -114,6 +115,37 @@ activityanalysistidy <- rbind(activityanalysistest, activityanalysistrain)
 
 
 ## MISC
+
+library(tidyr)
+library(lubridate)
+library(data.table)
+library(reshape)
+library(reshape2)
+
 table(subjecttestdata$V1) ## Create table identifying number of times a subject has data rows
 
 testdf <- subjecttestdata %>% left_join(activity, by = rownames(activity))   ## Will only work if we add matching columns with the rownum()
+
+featuresdatatest <- featuresdatatest %>% select(featureid, featurename, newfeaturename, contains("mean", ignore.case = TRUE), contains("std", ignore.case = TRUE))
+
+activityanalysistidy2 <- activityanalysistidy
+names(activityanalysistidy2)
+
+## Assigning Column names out of features list
+### NO LONGER REQUIRED ###colnames(xtraindata) <- featuresdatacolname   ## Assigns the character vector as the column names
+
+### no longer required ### featuresdata <-featuresdata %>% rename(featureid = V1, featurename = V2)  ## Rename Columns
+
+featuresdatatest <- mutate(featuresdata, newfeaturename = featuresdata$featurename)
+featuresdatatest2 <- featuresdatatest %>% filter(featuresdatatest$featurename %like% "mean")
+
+### no longer required ### subjecttestdata <- subjecttestdata %>% rename(subject = V1)   ## Rename Columns
+### no longer required ## activitylabels <- activitylabels %>% rename(activityid = V1, activity = V2)   ## Rename Columns
+### no longer required ### ytestdata <- ytestdata %>% rename(activityid = V1)   ## Rename Columns
+## Assigning Column names out of features list
+### NO LONGER REQUIRED ### colnames(xtestdata) <- featuresdatacolname   ## Assigns the character vector as the column names
+### no longer needed ### subjecttraindata <- subjecttraindata %>% rename(subject = V1)   ## Rename Columns
+### no longer needed ### ytraindata <- ytraindata %>% rename(activityid = V1)   ## Rename Columns
+## TESTING activitydatatrain <- mutate(activity, V3 = rownames(activity))   ## TESTING - Adds rownames() as a column to test if the data moves when using "merge" 
+
+
