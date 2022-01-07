@@ -1,4 +1,21 @@
 
+### Download and Unpack files - Original Code by Len Greski https://github.com/lgreski/datasciencectacontent/blob/master/markdown/rprog-downloadingFiles.md
+
+fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
+zipfilename <- "getdata_projectfiles_UCI HAR Dataset.zip"
+dlMethod <- "curl" # sets default for OSX / Linux
+if(substr(Sys.getenv("OS"),1,7) == "Windows") dlMethod <- "wininet"
+if(!file.exists(zipfilename)) {
+      download.file(fileUrl,
+                    destfile = zipfilename,  # stores file in R working directory
+                    method=dlMethod) # use OS-appropriate method
+}
+
+if (!file.exists("UCI HAR Dataset")) { 
+      unzip(zipfilename) 
+}
+
+
 ## Required Library List
 library(dplyr)
 
@@ -109,8 +126,10 @@ independenttidy <- activityanalysistidy %>%
       summarize(across(everything(), list(mean)))
 
 
+## Write the independent tidy data set
+#--------------------------------------------------------------
 
-
+write.table(independenttidy, "Independent Tidy Data.txt", row.name=FALSE)
 
 
 
