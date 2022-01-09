@@ -16,34 +16,34 @@ if (!file.exists("UCI HAR Dataset")) {
 }
 
 
-## Required Library List
+### Required Library List1
 library(dplyr)
 
 
-## Loading Universal Data Tables: features and activity_labels
+### Loading Universal Data Tables: features and activity_labels
 
 ## Features List Table - features.txt - 561 obs of 2 variables
-featuresdata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\features.txt", col.names = c("featureid", "featurename"))
+featuresdata <- read.table(file = ".\\UCI HAR Dataset\\features.txt", col.names = c("featureid", "featurename"))
 
 ## Creating Column names out of features list
 featuresdatacolname <- featuresdata$featurename   ## Creates a character vector - for use with colnames() to create column names
 
 
 ## Activity Labels - activity_labels.txt - 6 obs of 2 variables
-activitylabels <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\activity_labels.txt", col.names = c("activityid", "activity"))
+activitylabels <- read.table(file = ".\\UCI HAR Dataset\\activity_labels.txt", col.names = c("activityid", "activity"))
 
 
 ## Loading Test data: subject_test, X_test, y_test 
 #--------------------------------------------------------------
 
 ## Test Subjects - subject_test.txt - 2947 obs of 1 variable
-subjecttestdata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\test\\subject_test.txt", col.names = c("subject"))
+subjecttestdata <- read.table(file = ".\\UCI HAR Dataset\\test\\subject_test.txt", col.names = c("subject"))
 
 ## Activity ID for Rows - y_test.txt - 2947 obs of 1 variable
-ytestdata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\test\\y_test.txt", col.names = c("activityid"))
+ytestdata <- read.table(file = ".\\UCI HAR Dataset\\test\\y_test.txt", col.names = c("activityid"))
 
 ## Test Data - X_test.txt - 2947 obs of 561 variables
-xtestdata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\test\\X_test.txt") ## renaming the column names???  , col.names = featuresdata$featurename)
+xtestdata <- read.table(file = ".\\UCI HAR Dataset\\test\\X_test.txt")
 colnames(xtestdata) <- featuresdatacolname   ## Assigns the character vector as the column names
 
 
@@ -52,9 +52,9 @@ colnames(xtestdata) <- featuresdatacolname   ## Assigns the character vector as 
 
 ##  Joining Activity Labels to Activity list
 activitydatatest <- ytestdata %>% left_join(activitylabels, by = "activityid")   ## Join the activity list with activity labels
-## TESTING activitydatatest <- mutate(activity, V3 = rownames(activity))   ## TESTING - Adds rownames() as a column to test if the data moves when using "merge" 
 
-## Joining the subjecttest list with activity
+
+## Joining the subjecttest list with activity and xtestdata
 activityanalysistest <- cbind(subjecttestdata, activity = activitydatatest$activity, xtestdata)   ## Combines the rows without changing the order
 
 
@@ -63,14 +63,14 @@ activityanalysistest <- cbind(subjecttestdata, activity = activitydatatest$activ
 #--------------------------------------------------------------
 
 ## Train Subjects - subject_train.txt - 2947 obs of 1 variable
-subjecttraindata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\train\\subject_train.txt", col.names = c("subject"))
+subjecttraindata <- read.table(file = ".\\UCI HAR Dataset\\train\\subject_train.txt", col.names = c("subject"))
 
 ## Train Data - X_train.txt - 2947 obs of 561 variables
-xtraindata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\train\\X_train.txt")  ## renaming the column names???  , col.names = featuresdata$featurename)
+xtraindata <- read.table(file = ".\\UCI HAR Dataset\\train\\X_train.txt")
 colnames(xtraindata) <- featuresdatacolname   ## Assigns the character vector as the column names
 
 ## Activity ID for Rows - y_train.txt - 2947 obs of 1 variable
-ytraindata <- read.table(file = "V:\\DataScience\\Projects\\GCDCourseProject\\UCI HAR Dataset\\train\\y_train.txt", col.names = c("activityid"))
+ytraindata <- read.table(file = ".\\UCI HAR Dataset\\train\\y_train.txt", col.names = c("activityid"))
 
 
 ## Joining Train data
