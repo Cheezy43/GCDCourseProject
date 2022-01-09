@@ -124,10 +124,10 @@ names(activityanalysistidy)<-gsub("\\(tBody", "\\(Time.Body", names(activityanal
 independenttidy <- activityanalysistidy %>%
       group_by(subject,activity) %>%
       summarize(across(everything(), list(mean)))
-
+      
 
 ## Write the independent tidy data set
 #--------------------------------------------------------------
 
-write.table(independenttidy, "Independent Tidy Data.txt", row.name=FALSE)
+write.table(independenttidy, "Independent Tidy Data.txt", row.name=FALSE, col.names = TRUE)
 
